@@ -6,7 +6,7 @@
   "author": "Yoshihide Shiono <shiono.yoshihide@gmail.com>",
   "license": "MIT",
   "bin": {
-    "gfm-preview": "index.js"
+    "preview": "index.js"
   },
   "scripts": {
     "build": "taskr build",
@@ -17,12 +17,5 @@
     "fastify": "^1.9.0",
     "minimist": "^1.2.0",
     "opn": "^5.3.0"
-  },
-  "devDependencies": {
-    "@taskr/shell": "^1.1.0",
-    "@taskr/typescript": "^1.1.0",
-    "@types/node": "^10.5.5",
-    "taskr": "^1.1.0",
-    "typescript": "^3.0.1"
   }
 }
