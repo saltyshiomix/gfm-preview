@@ -1,6 +1,6 @@
 {
   "name": "gfm-preview",
-  "version": "0.0.0",
+  "version": "0.0.1",
   "description": "Preview GitHub flavored markdown (GFM) using GitHub API in one command <3",
   "repository": "git@github.com:saltyshiomix/github-markdown-previewer.git",
   "author": "Yoshihide Shiono <shiono.yoshihide@gmail.com>",
