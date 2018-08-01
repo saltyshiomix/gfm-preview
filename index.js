@@ -63,11 +63,11 @@ fastify.get('/', async (request, reply) => {
   const response = await axios.post(apiUrl + '/markdown', { text: readFileSync(file, encoding), mode: 'gfm' })
   const content = response.data
   reply.header('Content-Type', 'text/html; charset=' + encoding)
-  reply.send(readFileSync('./index.html', encoding).replace(/<!--TITLE-->/, process.argv[2]).replace(/<!--CONTENT-->/, content))
+  reply.send(readFileSync(resolve(__dirname, 'index.html'), encoding).replace(/<!--TITLE-->/, process.argv[2]).replace(/<!--CONTENT-->/, content))
 })
 
 fastify.get('/hljs', async (request, reply) => {
-  reply.send(readFileSync('./hl.js', encoding))
+  reply.send(readFileSync(resolve(__dirname, 'hl.js'), encoding))
 })
 
 require('opn')(`http://localhost:${port}`)
