@@ -8,10 +8,6 @@
   "bin": {
     "preview": "index.js"
   },
-  "scripts": {
-    "build": "taskr build",
-    "prepublishOnly": "npm run build"
-  },
   "dependencies": {
     "axios": "^0.18.0",
     "fastify": "^1.9.0",
