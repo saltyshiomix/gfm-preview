@@ -41,7 +41,8 @@ if (argv.help || (!process.argv[2])) {
   process.exit(0)
 }
 
-const file = resolve(process.argv[2])
+const filename = argv._[0]
+const file = resolve(filename)
 if (!existsSync(file)) {
   console.error(chalk.red(`Not found: ${file}`))
   process.exit(1)
@@ -55,7 +56,7 @@ const app = require('express')()
 
 app.get('/', async (request, reply) => {
   reply.header('Content-Type', 'text/html; charset=' + encoding)
-  reply.send(readFileSync(resolve(__dirname, 'index.html'), encoding).replace(/<!--TITLE-->/, process.argv[2]))
+  reply.send(readFileSync(resolve(__dirname, 'index.html'), encoding).replace(/<!--TITLE-->/, filename))
 })
 
 app.get('/app.css', async (request, reply) => {
