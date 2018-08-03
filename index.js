@@ -89,6 +89,7 @@ io.on('connection', (socket) => {
   }
 
   watcher.on('change', () => {
+    console.log(`> gfm-preview: Detect changes and reloaded content`)
     responseContent()
   })
 
