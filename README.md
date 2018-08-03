@@ -23,13 +23,14 @@ Then, `gfm-preview` automatically launches `http://localhost:4649` in your defau
 
 ## If you use GitHub Enterprise (GHE)
 
+Add an alias to your `~./bashrc`:
+
 ```bash
-$ preview file.md --github-api-url https://your-ghe-host:port/api/v3
+alias preview='preview --github-api-url https://your-ghe-host:port/api/v3'
 ```
 
-Or use alias:
+Then use it:
 
 ```bash
-# ~./bashrc
-alias preview='preview --github-api-url https://your-ghe-host:port/api/v3'
+$ preview file.md
 ```
