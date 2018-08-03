@@ -8,27 +8,28 @@
 $ npm install --global gfm-preview
 
 # preview your markdown
-$ preview sample.md
+$ preview file.md
 ```
 
 Then, `gfm-preview` automatically launches `http://localhost:4649` in your default browser.
 
 ## Feature
 
-- Preview your markdown with GitHub API
+- Render your markdown with GitHub API
+- Launch a preview server
 - Hot reload previews when detecting changes
-- Close process when the preview is closed
+- Close the server when the preview is closed
 - Support GitHub Enterprise
 
-## Usage on GitHub Enterprise (GHE)
+## If you use GitHub Enterprise (GHE)
 
 ```bash
-$ preview file.md --github-api-url <https://your-ghe-host:port/api/v3>
+$ preview file.md --github-api-url https://your-ghe-host:port/api/v3
 ```
 
 Or use alias:
 
 ```bash
-# ~./bash_rc
-alias preview='preview --github-api-url <https://your-ghe-host:port/api/v3>'
+# ~./bashrc
+alias preview='preview --github-api-url https://your-ghe-host:port/api/v3'
 ```
