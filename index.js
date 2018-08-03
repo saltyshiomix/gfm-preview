@@ -66,7 +66,18 @@ fastify.get('/', async (request, reply) => {
   reply.send(readFileSync(resolve(__dirname, 'index.html'), encoding).replace(/<!--TITLE-->/, process.argv[2]).replace(/<!--CONTENT-->/, content))
 })
 
-fastify.get('/hljs', async (request, reply) => {
+fastify.get('/app.css', async (request, reply) => {
+  reply.header('Content-Type', 'text/css; charset=' + encoding)
+  reply.send(readFileSync(resolve(__dirname, 'app.css'), encoding))
+})
+
+fastify.get('/hl.css', async (request, reply) => {
+  reply.header('Content-Type', 'text/css; charset=' + encoding)
+  reply.send(readFileSync(resolve(__dirname, 'hl.css'), encoding))
+})
+
+fastify.get('/hl.js', async (request, reply) => {
+  reply.header('Content-Type', 'text/javascript; charset=' + encoding)
   reply.send(readFileSync(resolve(__dirname, 'hl.js'), encoding))
 })
 
