@@ -5,11 +5,21 @@
 <link rel="stylesheet" type="text/css" href="http://localhost:4649/app.css">
 <link rel="stylesheet" type="text/css" href="http://localhost:4649/hl.css">
 </head>
-<body class="markdown-body">
-<!--CONTENT-->
-<script src="http://localhost:4649/hl.js"></script>
-<script type="text/javascript">
-hljs.initHighlightingOnLoad();
-</script>
+<body>
+  <div id="app" class="markdown-body"></div>
+  <script src="http://localhost:4649/hl.js"></script>
+  <script src="http://localhost:4649/io.js"></script>
+  <script type="text/javascript">
+    window.addEventListener('DOMContentLoaded', function() {
+      var socket = io('http://localhost:4649');
+      socket.on('connect', function() {
+        socket.emit('request content');
+        socket.on('response content', function (data) {
+          document.getElementById('app').innerHTML = data;
+          hljs.initHighlightingOnLoad();
+        });
+      });
+    });
+  </script>
 </body>
 </html>

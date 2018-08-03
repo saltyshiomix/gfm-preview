@@ -1,6 +1,6 @@
 #!/usr/bin/env node
 
-const { resolve } = require('path')
+const { resolve, relative } = require('path')
 const { existsSync, readFileSync } = require('fs')
 const parseArgs = require('minimist')
 
@@ -49,38 +49,72 @@ const port = 4649
 const encoding = 'utf-8'
 const apiUrl = argv['github-api-url'] ? argv['github-api-url'] : 'https://api.github.com'
 const axios = require('axios')
-const server = require('express')()
-const start = async () => {
-  try {
-    await server.listen(port)
-  } catch (err) {
-    server.log.error(err)
-    process.exit(1)
-  }
-}
+const app = require('express')()
 
-server.get('/', async (request, reply) => {
-  const response = await axios.post(apiUrl + '/markdown', { text: readFileSync(file, encoding), mode: 'gfm' })
-  const content = response.data
+app.get('/', async (request, reply) => {
   reply.header('Content-Type', 'text/html; charset=' + encoding)
-  reply.send(readFileSync(resolve(__dirname, 'index.html'), encoding).replace(/<!--TITLE-->/, process.argv[2]).replace(/<!--CONTENT-->/, content))
+  reply.send(readFileSync(resolve(__dirname, 'index.html'), encoding).replace(/<!--TITLE-->/, process.argv[2]))
 })
 
-server.get('/app.css', async (request, reply) => {
+app.get('/app.css', async (request, reply) => {
   reply.header('Content-Type', 'text/css; charset=' + encoding)
   reply.send(readFileSync(resolve(__dirname, 'app.css'), encoding))
 })
 
-server.get('/hl.css', async (request, reply) => {
+app.get('/hl.css', async (request, reply) => {
   reply.header('Content-Type', 'text/css; charset=' + encoding)
   reply.send(readFileSync(resolve(__dirname, 'hl.css'), encoding))
 })
 
-server.get('/hl.js', async (request, reply) => {
+app.get('/hl.js', async (request, reply) => {
   reply.header('Content-Type', 'text/javascript; charset=' + encoding)
   reply.send(readFileSync(resolve(__dirname, 'hl.js'), encoding))
 })
 
-require('opn')(`http://localhost:${port}`)
+app.get('/io.js', async (request, reply) => {
+  reply.header('Content-Type', 'text/javascript; charset=' + encoding)
+  reply.send(readFileSync(resolve(__dirname, 'node_modules/socket.io-client/dist/socket.io.js'), encoding))
+})
+
+const { watch } = require('chokidar')
+const watcher = watch([file])
+const server = require('http').createServer(app)
+const io = require('socket.io')(server)
+
+io.on('connection', (socket) => {
+  const responseContent = async () => {
+    const response = await axios.post(apiUrl + '/markdown', { text: readFileSync(file, encoding), mode: 'gfm' })
+    let content = response.data
+    socket.emit('response content', content)
+  }
+
+  watcher.on('change', () => {
+    responseContent()
+  })
+
+  socket.on('request content', () => {
+    responseContent()
+  })
+
+  socket.on('disconnect', () => {
+    if (io.sockets.server.engine.clientsCount === 0) {
+      console.log(`> gfm-preview: Have a nice code!`)
+      process.exit(0)
+    }
+  })
+})
+
+const url = `http://localhost:${port}`
+const start = async () => {
+  try {
+    require('opn')(url)
+    await server.listen(port, () => {
+      console.log(`> gfm-preview: Ready on ${url}`)
+    })
+  } catch (err) {
+    console.error(err)
+    process.exit(1)
+  }
+}
 
 start()
