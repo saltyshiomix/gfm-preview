@@ -17,4 +17,4 @@ Then, `gfm-preview` automatically launches `http://localhost:4649` in your defau
 
 - Preview your markdown with GitHub API
 - Hot reload previews when detecting changes
-- Close process when detecting the preview is closed
+- Close process when the preview is closed
