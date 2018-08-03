@@ -49,7 +49,7 @@ const port = 4649
 const encoding = 'utf-8'
 const apiUrl = argv['github-api-url'] ? argv['github-api-url'] : 'https://api.github.com'
 const axios = require('axios')
-const server = require('fastify')()
+const server = require('express')()
 const start = async () => {
   try {
     await server.listen(port)
