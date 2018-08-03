@@ -4,11 +4,17 @@
 ## Usage
 
 ```bash
-# install
+# install it
 $ npm install --global gfm-preview
 
-# use it
+# preview your markdown
 $ preview sample.md
 ```
 
-Then, automatically open `http://localhost:4649` in your default browser.
+Then, `gfm-preview` automatically launches `http://localhost:4649` in your default browser.
+
+## Feature
+
+- Preview your markdown with GitHub API
+- Hot reload previews when detecting changes
+- Close process when detecting the preview is closed
