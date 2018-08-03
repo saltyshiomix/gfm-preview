@@ -49,34 +49,34 @@ const port = 4649
 const encoding = 'utf-8'
 const apiUrl = argv['github-api-url'] ? argv['github-api-url'] : 'https://api.github.com'
 const axios = require('axios')
-const fastify = require('fastify')()
+const server = require('fastify')()
 const start = async () => {
   try {
-    await fastify.listen(port)
+    await server.listen(port)
   } catch (err) {
-    fastify.log.error(err)
+    server.log.error(err)
     process.exit(1)
   }
 }
 
-fastify.get('/', async (request, reply) => {
+server.get('/', async (request, reply) => {
   const response = await axios.post(apiUrl + '/markdown', { text: readFileSync(file, encoding), mode: 'gfm' })
   const content = response.data
   reply.header('Content-Type', 'text/html; charset=' + encoding)
   reply.send(readFileSync(resolve(__dirname, 'index.html'), encoding).replace(/<!--TITLE-->/, process.argv[2]).replace(/<!--CONTENT-->/, content))
 })
 
-fastify.get('/app.css', async (request, reply) => {
+server.get('/app.css', async (request, reply) => {
   reply.header('Content-Type', 'text/css; charset=' + encoding)
   reply.send(readFileSync(resolve(__dirname, 'app.css'), encoding))
 })
 
-fastify.get('/hl.css', async (request, reply) => {
+server.get('/hl.css', async (request, reply) => {
   reply.header('Content-Type', 'text/css; charset=' + encoding)
   reply.send(readFileSync(resolve(__dirname, 'hl.css'), encoding))
 })
 
-fastify.get('/hl.js', async (request, reply) => {
+server.get('/hl.js', async (request, reply) => {
   reply.header('Content-Type', 'text/javascript; charset=' + encoding)
   reply.send(readFileSync(resolve(__dirname, 'hl.js'), encoding))
 })
