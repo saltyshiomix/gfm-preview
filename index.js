@@ -43,7 +43,7 @@ if (argv.help || (!process.argv[2])) {
 
 const file = resolve(process.argv[2])
 if (!existsSync(file)) {
-  console.error(`Not found: ${file}`)
+  console.error(chalk.red(`Not found: ${file}`))
   process.exit(1)
 }
 
@@ -91,7 +91,7 @@ io.on('connection', (socket) => {
   }
 
   watcher.on('change', () => {
-    console.log(`> gfm-preview: Detect changes and reloaded content`)
+    console.log(chalk`> {cyan gfm-preview}: Detect changes and reloaded content`)
     responseContent()
   })
 
@@ -101,7 +101,7 @@ io.on('connection', (socket) => {
 
   socket.on('disconnect', () => {
     if (io.sockets.server.engine.clientsCount === 0) {
-      console.log(`> gfm-preview: Have a nice code!`)
+      console.log(chalk`> {cyan gfm-preview}: Have a nice code!`)
       process.exit(0)
     }
   })
@@ -112,7 +112,7 @@ const start = async () => {
   try {
     require('opn')(url)
     await server.listen(port, () => {
-      console.log(`> gfm-preview: Ready on ${url}`)
+      console.log(chalk`> {cyan gfm-preview}: Ready on ${url}`)
     })
   } catch (err) {
     console.error(err)
