@@ -18,3 +18,17 @@ Then, `gfm-preview` automatically launches `http://localhost:4649` in your defau
 - Preview your markdown with GitHub API
 - Hot reload previews when detecting changes
 - Close process when the preview is closed
+- Support GitHub Enterprise
+
+## Usage on GitHub Enterprise (GHE)
+
+```bash
+$ preview file.md --github-api-url <https://your-ghe-host:port/api/v3>
+```
+
+Or use alias:
+
+```bash
+# ~./bash_rc
+alias preview='preview --github-api-url <https://your-ghe-host:port/api/v3>'
+```
