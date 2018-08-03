@@ -2,6 +2,7 @@
 
 const { resolve, relative } = require('path')
 const { existsSync, readFileSync } = require('fs')
+const chalk = require('chalk')
 const parseArgs = require('minimist')
 
 const argv = parseArgs(process.argv.slice(2), {
@@ -22,19 +23,20 @@ if (argv.version) {
 }
 
 if (argv.help || (!process.argv[2])) {
-  console.log(`
-    Description
-      Preview GitHub flavored markdown
+  console.log(chalk`
+    {bold.cyan gfm-preview} - Preview your markdown with GitHub API in real time
 
-    Usage
-      $ gfm-preview <markdown file> [--github-api-url <github api url>]
+    {bold USAGE}
 
-    Args
-      <markdown file>  A markdown file which you want to preview
+      {bold $} {cyan preview} --help
+      {bold $} {cyan preview} --version
+      {bold $} {cyan preview} {underline file.md} [--github-api-url {underline github_api_url}]
 
-    Options
-      --github-api-url <github api url>  GitHub API URL (default: 'https://api.github.com')
-      --help, -h                         Displays this message
+    {bold OPTIONS}
+
+      --help, -h                       shows this help message
+      --version, -v                    displays the current version of gfm-preview
+      --github-api-url {underline github_api_url}  sets the GitHub API URL (default: {underline https://api.github.com})
   `)
   process.exit(0)
 }
