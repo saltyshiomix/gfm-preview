@@ -3,26 +3,24 @@
 const { resolve, relative } = require('path')
 const { existsSync, readFileSync } = require('fs')
 const chalk = require('chalk')
-const parseArgs = require('minimist')
+const arg = require('arg')
 
-const argv = parseArgs(process.argv.slice(2), {
-  alias: {
-    v: 'version',
-    h: 'help'
-  },
-  boolean: [
-    'v',
-    'h'
-  ]
+const args = arg({
+  '--help': Boolean,
+  '--version': Boolean,
+  '--github-api-url': String,
+  '-h': '--help',
+  '-v': '--version'
 })
 
-if (argv.version) {
+if (args['--version']) {
   const pkg = require(resolve(__dirname, './package.json'))
   console.log(`gfm-preview v${pkg.version}`)
   process.exit(0)
 }
 
-if (argv.help || (!process.argv[2])) {
+const filename = args._[0]
+if (args['--help'] || (!filename)) {
   console.log(chalk`
     {bold.cyan gfm-preview} - Preview your markdown with GitHub API in real time
 
@@ -41,7 +39,6 @@ if (argv.help || (!process.argv[2])) {
   process.exit(0)
 }
 
-const filename = argv._[0]
 const file = resolve(filename)
 if (!existsSync(file)) {
   console.error(chalk.red(`Not found: ${file}`))
@@ -50,7 +47,7 @@ if (!existsSync(file)) {
 
 const port = 4649
 const encoding = 'utf-8'
-const apiUrl = argv['github-api-url'] ? argv['github-api-url'] : 'https://api.github.com'
+const apiUrl = args['--github-api-url'] ? args['--github-api-url'] : 'https://api.github.com'
 const axios = require('axios')
 const app = require('express')()
 
