@@ -5,6 +5,20 @@
   "repository": "git@github.com:saltyshiomix/gfm-preview.git",
   "author": "Yoshihide Shiono <shiono.yoshihide@gmail.com>",
   "license": "MIT",
+  "homepage": "https://github.com/saltyshiomix/gfm-preview",
+  "keywords": [
+    "markdown",
+    "preview",
+    "gfm",
+    "gfm-preview",
+    "github",
+    "ghe",
+    "github enterprise"
+  ],
+  "bugs": {
+    "url": "https://github.com/saltyshiomix/gfm-preview/issues",
+    "email": "shiono.yoshihide@gmail.com"
+  },
   "bin": {
     "preview": "index.js"
   },
