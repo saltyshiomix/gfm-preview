@@ -56,29 +56,29 @@ const apiUrl = args['--github-api-url'] ? args['--github-api-url'] : 'https://ap
 const axios = require('axios')
 const app = require('express')()
 
-app.get('/', async (request, reply) => {
-  reply.header('Content-Type', 'text/html; charset=' + encoding)
-  reply.send(readFileSync(resolve(__dirname, 'index.html'), encoding).replace(/<!--TITLE-->/, filename))
+app.get('/', async (_, res) => {
+  res.header('Content-Type', 'text/html; charset=' + encoding)
+  res.send(readFileSync(resolve(__dirname, 'index.html'), encoding).replace(/<!--TITLE-->/, filename))
 })
 
-app.get('/app.css', async (request, reply) => {
-  reply.header('Content-Type', 'text/css; charset=' + encoding)
-  reply.send(readFileSync(resolve(__dirname, 'app.css'), encoding))
+app.get('/app.css', async (_, res) => {
+  res.header('Content-Type', 'text/css; charset=' + encoding)
+  res.send(readFileSync(resolve(__dirname, 'app.css'), encoding))
 })
 
-app.get('/hl.css', async (request, reply) => {
-  reply.header('Content-Type', 'text/css; charset=' + encoding)
-  reply.send(readFileSync(resolve(__dirname, 'hl.css'), encoding))
+app.get('/hl.css', async (_, res) => {
+  res.header('Content-Type', 'text/css; charset=' + encoding)
+  res.send(readFileSync(resolve(__dirname, 'hl.css'), encoding))
 })
 
-app.get('/hl.js', async (request, reply) => {
-  reply.header('Content-Type', 'text/javascript; charset=' + encoding)
-  reply.send(readFileSync(resolve(__dirname, 'hl.js'), encoding))
+app.get('/hl.js', async (_, res) => {
+  res.header('Content-Type', 'text/javascript; charset=' + encoding)
+  res.send(readFileSync(resolve(__dirname, 'hl.js'), encoding))
 })
 
-app.get('/io.js', async (request, reply) => {
-  reply.header('Content-Type', 'text/javascript; charset=' + encoding)
-  reply.send(readFileSync(resolve(__dirname, 'node_modules/socket.io-client/dist/socket.io.js'), encoding))
+app.get('/io.js', async (_, res) => {
+  res.header('Content-Type', 'text/javascript; charset=' + encoding)
+  res.send(readFileSync(resolve(__dirname, 'node_modules/socket.io-client/dist/socket.io.js'), encoding))
 })
 
 const { watch } = require('chokidar')
