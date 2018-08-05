@@ -2,22 +2,37 @@
 <html>
 <head>
 <title><!--TITLE--></title>
-<link rel="stylesheet" type="text/css" href="http://localhost:4649/app.css">
-<link rel="stylesheet" type="text/css" href="http://localhost:4649/hl.css">
+<link rel="stylesheet" type="text/css" href="http://localhost:4649/gfm/app.css">
+<link rel="stylesheet" type="text/css" href="http://localhost:4649/gfm/hl.css">
 </head>
 <body>
   <div id="app" class="markdown-body"></div>
-  <script src="http://localhost:4649/hl.js"></script>
-  <script src="http://localhost:4649/io.js"></script>
+  <script src="http://localhost:4649/gfm/hl.js"></script>
+  <script src="http://localhost:4649/gfm/io.js"></script>
   <script type="text/javascript">
     window.addEventListener('DOMContentLoaded', function() {
       var socket = io('http://localhost:4649');
       socket.on('connect', function() {
+        var clicking;
         socket.emit('request content');
+        socket.emit('clicked');
         socket.on('response content', function (data) {
           document.getElementById('app').innerHTML = data;
           hljs.initHighlightingOnLoad();
+          document.querySelectorAll('a').forEach(function(link) {
+            link.addEventListener('click', function(e) {
+              e.preventDefault();
+              socket.emit('clicking');
+              clicking = e.target.href;
+            });
+          });
         });
+        socket.on('clickable', () => {
+          if (clicking) {
+            window.location.href = clicking;
+            clicking = null;
+          }
+        })
       });
     });
   </script>
