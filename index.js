@@ -3,26 +3,26 @@
 const { resolve, relative } = require('path')
 const { existsSync, readFileSync } = require('fs')
 const chalk = require('chalk')
-const parseArgs = require('minimist')
+const arg = require('arg')
 
-const argv = parseArgs(process.argv.slice(2), {
-  alias: {
-    v: 'version',
-    h: 'help'
-  },
-  boolean: [
-    'v',
-    'h'
-  ]
+const args = arg({
+  '--help': Boolean,
+  '--version': Boolean,
+  '--github-api-url': String,
+  '--browser': String,
+  '-h': '--help',
+  '-v': '--version',
+  '-b': '--browser'
 })
 
-if (argv.version) {
+if (args['--version']) {
   const pkg = require(resolve(__dirname, './package.json'))
   console.log(`gfm-preview v${pkg.version}`)
   process.exit(0)
 }
 
-if (argv.help || (!process.argv[2])) {
+const filename = args._[0]
+if (args['--help'] || (!filename)) {
   console.log(chalk`
     {bold.cyan gfm-preview} - Preview your markdown with GitHub API in real time
 
@@ -30,18 +30,20 @@ if (argv.help || (!process.argv[2])) {
 
       {bold $} {cyan preview} --help
       {bold $} {cyan preview} --version
+      {bold $} {cyan preview} {underline file.md}
+      {bold $} {cyan preview} {underline file.md} [--brower {underline brower_name_or_executable}]
       {bold $} {cyan preview} {underline file.md} [--github-api-url {underline github_api_url}]
 
     {bold OPTIONS}
 
-      --help, -h                       shows this help message
-      --version, -v                    displays the current version of gfm-preview
-      --github-api-url {underline github_api_url}  sets the GitHub API URL (default: {underline https://api.github.com})
+      --help, -h                               shows this help message
+      --version, -v                            displays the current version of gfm-preview
+      --browser, -b {underline brower_name_or_executable}  sets the browser to open a preview
+      --github-api-url {underline github_api_url}          sets the GitHub API URL (default: {underline https://api.github.com})
   `)
   process.exit(0)
 }
 
-const filename = argv._[0]
 const file = resolve(filename)
 if (!existsSync(file)) {
   console.error(chalk.red(`Not found: ${file}`))
@@ -50,7 +52,7 @@ if (!existsSync(file)) {
 
 const port = 4649
 const encoding = 'utf-8'
-const apiUrl = argv['github-api-url'] ? argv['github-api-url'] : 'https://api.github.com'
+const apiUrl = args['--github-api-url'] ? args['--github-api-url'] : 'https://api.github.com'
 const axios = require('axios')
 const app = require('express')()
 
@@ -111,7 +113,11 @@ io.on('connection', (socket) => {
 const url = `http://localhost:${port}`
 const start = async () => {
   try {
-    require('opn')(url)
+    if (args['--browser']) {
+      require('opn')(url, { app: args['--browser'] })
+    } else {
+      require('opn')(url)
+    }
     await server.listen(port, () => {
       console.log(chalk`> {cyan gfm-preview}: Ready on ${url}`)
     })
