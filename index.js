@@ -1,6 +1,6 @@
 #!/usr/bin/env node
 
-const { resolve, relative } = require('path')
+const { resolve, relative, basename, extname } = require('path')
 const { existsSync, readFileSync } = require('fs')
 const chalk = require('chalk')
 const arg = require('arg')
@@ -21,7 +21,7 @@ if (args['--version']) {
   process.exit(0)
 }
 
-const filename = args._[0]
+let filename = args._[0]
 if (args['--help'] || (!filename)) {
   console.log(chalk`
     {bold.cyan gfm-preview} - Preview your markdown with GitHub API in real time
@@ -44,22 +44,14 @@ if (args['--help'] || (!filename)) {
   process.exit(0)
 }
 
-const file = resolve(filename)
-if (!existsSync(file)) {
-  console.error(chalk.red(`Not found: ${file}`))
-  process.exit(1)
-}
-
+let currentFile = resolve(filename)
+let existsCurrentFile = existsSync(currentFile)
+const files = []
 const port = 4649
 const encoding = 'utf-8'
 const apiUrl = args['--github-api-url'] ? args['--github-api-url'] : 'https://api.github.com'
 const axios = require('axios')
 const app = require('express')()
-
-app.get('/', async (_, res) => {
-  res.header('Content-Type', 'text/html; charset=' + encoding)
-  res.send(readFileSync(resolve(__dirname, 'index.html'), encoding).replace(/<!--TITLE-->/, filename))
-})
 
 app.get('/gfm/app.css', async (_, res) => {
   res.header('Content-Type', 'text/css; charset=' + encoding)
@@ -81,15 +73,43 @@ app.get('/gfm/io.js', async (_, res) => {
   res.send(readFileSync(resolve(__dirname, 'node_modules/socket.io-client/dist/socket.io.js'), encoding))
 })
 
+app.get('*', async (req, res) => {
+  if (req.params[0] === '/') {
+    res.send('Please select a file to preview')
+    return
+  }
+
+  const file = resolve(req.params[0].slice(1))
+  currentFile = file
+  existsCurrentFile = existsSync(file)
+  if (existsCurrentFile) {
+    if (!files.includes(currentFile)) {
+      files.push(currentFile)
+    }
+    res.header('Content-Type', 'text/html; charset=' + encoding)
+    res.send(readFileSync(resolve(__dirname, 'index.html'), encoding).replace(/<!--TITLE-->/, basename(currentFile)))
+  } else {
+    res.header('Content-Type', 'text/html; charset=' + encoding)
+    res.send(readFileSync(resolve(__dirname, 'index.html'), encoding).replace(/<!--TITLE-->/, `Not found: ${basename(currentFile)}`))
+  }
+})
+
 const { watch } = require('chokidar')
-const watcher = watch([file])
+const watcher = watch(files)
 const server = require('http').createServer(app)
 const io = require('socket.io')(server)
 
 io.on('connection', (socket) => {
   const responseContent = async () => {
-    const response = await axios.post(apiUrl + '/markdown', { text: readFileSync(file, encoding), mode: 'gfm' })
-    let content = response.data
+    let content
+    const text = existsCurrentFile ? readFileSync(currentFile, encoding) : `Not found: ${currentFile}`
+    const markdownExtension = /\.m(arkdown|kdn?|d(o?wn)?)(\?.*)?(#.*)?$/i
+    if (markdownExtension.test(extname(currentFile))) {
+      const response = await axios.post(apiUrl + '/markdown', { text, mode: 'gfm' })
+      content = response.data
+    } else {
+      content = `<pre><code>${text}</code></pre>`
+    }
     socket.emit('response content', content)
   }
 
@@ -102,8 +122,17 @@ io.on('connection', (socket) => {
     responseContent()
   })
 
+  socket.on('clicking', () => {
+    clicking = true
+    socket.emit('clickable')
+  })
+
+  socket.on('clicked', () => {
+    clicking = false
+  })
+
   socket.on('disconnect', () => {
-    if (io.sockets.server.engine.clientsCount === 0) {
+    if (!clicking && io.sockets.server.engine.clientsCount === 0) {
       console.log(chalk`> {cyan gfm-preview}: Have a nice code!`)
       process.exit(0)
     }
@@ -114,9 +143,9 @@ const url = `http://localhost:${port}`
 const start = async () => {
   try {
     if (args['--browser']) {
-      require('opn')(url, { app: args['--browser'] })
+      require('opn')(url + '/' + basename(currentFile), { app: args['--browser'] })
     } else {
-      require('opn')(url)
+      require('opn')(url + '/' + basename(currentFile))
     }
     await server.listen(port, () => {
       console.log(chalk`> {cyan gfm-preview}: Ready on ${url}`)
