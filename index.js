@@ -61,22 +61,22 @@ app.get('/', async (_, res) => {
   res.send(readFileSync(resolve(__dirname, 'index.html'), encoding).replace(/<!--TITLE-->/, filename))
 })
 
-app.get('/app.css', async (_, res) => {
+app.get('/gfm/app.css', async (_, res) => {
   res.header('Content-Type', 'text/css; charset=' + encoding)
   res.send(readFileSync(resolve(__dirname, 'app.css'), encoding))
 })
 
-app.get('/hl.css', async (_, res) => {
+app.get('/gfm/hl.css', async (_, res) => {
   res.header('Content-Type', 'text/css; charset=' + encoding)
   res.send(readFileSync(resolve(__dirname, 'hl.css'), encoding))
 })
 
-app.get('/hl.js', async (_, res) => {
+app.get('/gfm/hl.js', async (_, res) => {
   res.header('Content-Type', 'text/javascript; charset=' + encoding)
   res.send(readFileSync(resolve(__dirname, 'hl.js'), encoding))
 })
 
-app.get('/io.js', async (_, res) => {
+app.get('/gfm/io.js', async (_, res) => {
   res.header('Content-Type', 'text/javascript; charset=' + encoding)
   res.send(readFileSync(resolve(__dirname, 'node_modules/socket.io-client/dist/socket.io.js'), encoding))
 })
