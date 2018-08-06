@@ -52,6 +52,8 @@ const encoding = 'utf-8'
 const apiUrl = args['--github-api-url'] ? args['--github-api-url'] : 'https://api.github.com'
 const axios = require('axios')
 const app = require('express')()
+const { watch } = require('chokidar')
+let watcher
 
 app.get('/gfm/app.css', async (_, res) => {
   res.header('Content-Type', 'text/css; charset=' + encoding)
@@ -85,6 +87,10 @@ app.get('*', async (req, res) => {
   if (existsCurrentFile) {
     if (!files.includes(currentFile)) {
       files.push(currentFile)
+      if (watcher) {
+        watcher.close()
+      }
+      watcher = watch(files)
     }
     res.header('Content-Type', 'text/html; charset=' + encoding)
     res.send(readFileSync(resolve(__dirname, 'index.html'), encoding).replace(/<!--TITLE-->/, basename(currentFile)))
@@ -94,8 +100,6 @@ app.get('*', async (req, res) => {
   }
 })
 
-const { watch } = require('chokidar')
-const watcher = watch(files)
 const server = require('http').createServer(app)
 const io = require('socket.io')(server)
 
@@ -114,7 +118,7 @@ io.on('connection', (socket) => {
   }
 
   watcher.on('change', () => {
-    console.log(chalk`> {cyan gfm-preview}: Detect changes and reloaded content`)
+    console.log(chalk`> {cyan gfm-preview}: Detect changes and reloaded content (${basename(currentFile)})`)
     responseContent()
   })
 
