@@ -32,7 +32,13 @@
             window.location.href = clicking;
             clicking = null;
           }
-        })
+        });
+        history.pushState(null, null, location.href);
+        window.onpopstate = function () {
+          clicking = document.referrer;
+          history.go(1);
+          socket.emit('clicking');
+        };
       });
     });
   </script>
