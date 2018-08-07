@@ -55,6 +55,16 @@ const app = require('express')()
 const { watch } = require('chokidar')
 let watcher
 
+app.get('/gfm/favicon.ico', async (_, res) => {
+  res.header('Content-Type', 'image/x-icon')
+  res.send(readFileSync(resolve(__dirname, 'favicon.ico')))
+})
+
+app.get('/gfm/favicon.png', async (_, res) => {
+  res.header('Content-Type', 'image/png')
+  res.send(readFileSync(resolve(__dirname, 'favicon.png')))
+})
+
 app.get('/gfm/app.css', async (_, res) => {
   res.header('Content-Type', 'text/css; charset=' + encoding)
   res.send(readFileSync(resolve(__dirname, 'app.css'), encoding))
