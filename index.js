@@ -80,7 +80,7 @@ app.get('/gfm/hl.js', async (_, res) => {
   res.send(readFileSync(resolve(__dirname, 'hl.js'), encoding))
 })
 
-app.get('/gfm/io.js', async (_, res) => {
+app.get('/gfm/socket.io.js', async (_, res) => {
   res.header('Content-Type', 'text/javascript; charset=' + encoding)
   res.send(readFileSync(resolve(__dirname, 'node_modules/socket.io-client/dist/socket.io.js'), encoding))
 })
