@@ -85,6 +85,11 @@ app.get('/gfm/io.js', async (_, res) => {
   res.send(readFileSync(resolve(__dirname, 'node_modules/socket.io-client/dist/socket.io.js'), encoding))
 })
 
+app.get('/gfm/socket.io.js.map', async (_, res) => {
+  res.header('Content-Type', 'text/plain; charset=' + encoding)
+  res.send(readFileSync(resolve(__dirname, 'node_modules/socket.io-client/dist/socket.io.js.map'), encoding))
+})
+
 app.get('*', async (req, res) => {
   if (req.params[0] === '/') {
     res.send('Please select a file to preview')
