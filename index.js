@@ -10,9 +10,13 @@ const args = arg({
   '--version': Boolean,
   '--github-api-url': String,
   '--browser': String,
+  '--host': String,
+  '--port': Number,
   '-h': '--help',
   '-v': '--version',
-  '-b': '--browser'
+  '-b': '--browser',
+  '-H': '--host',
+  '-p': '--port'
 })
 
 if (args['--version']) {
@@ -32,6 +36,7 @@ if (args['--help'] || (!filename)) {
       {bold $} {cyan preview} --version
       {bold $} {cyan preview} {underline file.md}
       {bold $} {cyan preview} {underline file.md} [--brower {underline brower_name_or_executable}]
+      {bold $} {cyan preview} {underline file.md} [--host {underline hostname}] [--port {underline port_number}]
       {bold $} {cyan preview} {underline file.md} [--github-api-url {underline github_api_url}]
 
     {bold OPTIONS}
@@ -39,6 +44,8 @@ if (args['--help'] || (!filename)) {
       --help, -h                               shows this help message
       --version, -v                            displays the current version of gfm-preview
       --browser, -b {underline brower_name_or_executable}  sets the browser to open a preview
+      --host, -H {underline hostname}                      sets the hostname
+      --port, -p {underline port_number}                   sets the port number
       --github-api-url {underline github_api_url}          sets the GitHub API URL (default: {underline https://api.github.com})
   `)
   process.exit(0)
@@ -47,7 +54,7 @@ if (args['--help'] || (!filename)) {
 let currentFile = resolve(filename)
 let existsCurrentFile = existsSync(currentFile)
 const files = []
-const port = 4649
+const port = args['--port'] ? args['--port'] : 4649
 const encoding = 'utf-8'
 const apiUrl = args['--github-api-url'] ? args['--github-api-url'] : 'https://api.github.com'
 const axios = require('axios')
@@ -108,10 +115,14 @@ app.get('*', async (req, res) => {
       watcher = watch(files)
     }
     res.header('Content-Type', 'text/html; charset=' + encoding)
-    res.send(readFileSync(resolve(__dirname, 'index.html'), encoding).replace(/<!--TITLE-->/, basename(currentFile)))
+    let html = readFileSync(resolve(__dirname, 'index.html'), encoding)
+    html = html.replace(/{%TITLE%}/, basename(currentFile)).replace(/{%HOST%}/g, host).replace(/{%PORT%}/g, port)
+    res.send(html)
   } else {
     res.header('Content-Type', 'text/html; charset=' + encoding)
-    res.send(readFileSync(resolve(__dirname, 'index.html'), encoding).replace(/<!--TITLE-->/, `Not found: ${basename(currentFile)}`))
+    let html = readFileSync(resolve(__dirname, 'index.html'), encoding)
+    html = html.replace(/{%TITLE%}/, `Not found: ${basename(currentFile)}`).replace(/{%HOST%}/g, host).replace(/{%PORT%}/g, port)
+    res.send(html)
   }
 })
 
@@ -124,8 +135,12 @@ io.on('connection', (socket) => {
     const text = existsCurrentFile ? readFileSync(currentFile, encoding) : `Not found: ${currentFile}`
     const markdownExtension = /\.m(arkdown|kdn?|d(o?wn)?)(\?.*)?(#.*)?$/i
     if (markdownExtension.test(extname(currentFile))) {
-      const response = await axios.post(apiUrl + '/markdown', { text, mode: 'gfm' })
-      content = response.data
+      try {
+        const response = await axios.post(apiUrl + '/markdown', { text, mode: 'gfm' })
+        content = response.data
+      } catch (e) {
+        content = e.response.data.message
+      }
     } else {
       content = `<pre><code>${text}</code></pre>`
     }
@@ -158,7 +173,8 @@ io.on('connection', (socket) => {
   })
 })
 
-const url = `http://localhost:${port}`
+const host = args['--host'] ? args['--host'] : 'localhost'
+const url = `http://${host}:${port}`
 const start = async () => {
   try {
     if (args['--browser']) {
@@ -166,7 +182,7 @@ const start = async () => {
     } else {
       require('opn')(url + '/' + basename(currentFile))
     }
-    await server.listen(port, () => {
+    await server.listen(port, host, () => {
       console.log(chalk`> {cyan gfm-preview}: Ready on ${url}`)
     })
   } catch (err) {
