@@ -132,8 +132,12 @@ io.on('connection', (socket) => {
     const text = existsCurrentFile ? readFileSync(currentFile, encoding) : `Not found: ${currentFile}`
     const markdownExtension = /\.m(arkdown|kdn?|d(o?wn)?)(\?.*)?(#.*)?$/i
     if (markdownExtension.test(extname(currentFile))) {
-      const response = await axios.post(apiUrl + '/markdown', { text, mode: 'gfm' })
-      content = response.data
+      try {
+        const response = await axios.post(apiUrl + '/markdown', { text, mode: 'gfm' })
+        content = response.data
+      } catch (e) {
+        content = e.response.data.message
+      }
     } else {
       content = `<pre><code>${text}</code></pre>`
     }
