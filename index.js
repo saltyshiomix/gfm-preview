@@ -10,9 +10,13 @@ const args = arg({
   '--version': Boolean,
   '--github-api-url': String,
   '--browser': String,
+  '--host': String,
+  '--port': Number,
   '-h': '--help',
   '-v': '--version',
-  '-b': '--browser'
+  '-b': '--browser',
+  '-H': '--host',
+  '-p': '--port'
 })
 
 if (args['--version']) {
@@ -47,7 +51,7 @@ if (args['--help'] || (!filename)) {
 let currentFile = resolve(filename)
 let existsCurrentFile = existsSync(currentFile)
 const files = []
-const port = 4649
+const port = args['--port'] ? args['--port'] : 4649
 const encoding = 'utf-8'
 const apiUrl = args['--github-api-url'] ? args['--github-api-url'] : 'https://api.github.com'
 const axios = require('axios')
@@ -108,10 +112,14 @@ app.get('*', async (req, res) => {
       watcher = watch(files)
     }
     res.header('Content-Type', 'text/html; charset=' + encoding)
-    res.send(readFileSync(resolve(__dirname, 'index.html'), encoding).replace(/<!--TITLE-->/, basename(currentFile)))
+    let html = readFileSync(resolve(__dirname, 'index.html'), encoding)
+    html = html.replace(/{%TITLE%}/, basename(currentFile)).replace(/{%HOST%}/g, host).replace(/{%PORT%}/g, port)
+    res.send(html)
   } else {
     res.header('Content-Type', 'text/html; charset=' + encoding)
-    res.send(readFileSync(resolve(__dirname, 'index.html'), encoding).replace(/<!--TITLE-->/, `Not found: ${basename(currentFile)}`))
+    let html = readFileSync(resolve(__dirname, 'index.html'), encoding)
+    html = html.replace(/{%TITLE%}/, `Not found: ${basename(currentFile)}`).replace(/{%HOST%}/g, host).replace(/{%PORT%}/g, port)
+    res.send(html)
   }
 })
 
@@ -158,7 +166,8 @@ io.on('connection', (socket) => {
   })
 })
 
-const url = `http://localhost:${port}`
+const host = args['--host'] ? args['--host'] : 'localhost'
+const url = `http://${host}:${port}`
 const start = async () => {
   try {
     if (args['--browser']) {
@@ -166,7 +175,7 @@ const start = async () => {
     } else {
       require('opn')(url + '/' + basename(currentFile))
     }
-    await server.listen(port, () => {
+    await server.listen(port, host, () => {
       console.log(chalk`> {cyan gfm-preview}: Ready on ${url}`)
     })
   } catch (err) {
