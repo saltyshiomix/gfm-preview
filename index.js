@@ -36,6 +36,7 @@ if (args['--help'] || (!filename)) {
       {bold $} {cyan preview} --version
       {bold $} {cyan preview} {underline file.md}
       {bold $} {cyan preview} {underline file.md} [--brower {underline brower_name_or_executable}]
+      {bold $} {cyan preview} {underline file.md} [--host {underline hostname}] [--port {underline port_number}]
       {bold $} {cyan preview} {underline file.md} [--github-api-url {underline github_api_url}]
 
     {bold OPTIONS}
@@ -43,6 +44,8 @@ if (args['--help'] || (!filename)) {
       --help, -h                               shows this help message
       --version, -v                            displays the current version of gfm-preview
       --browser, -b {underline brower_name_or_executable}  sets the browser to open a preview
+      --host, -H {underline hostname}                      sets the hostname
+      --port, -p {underline port_number}                   sets the port number
       --github-api-url {underline github_api_url}          sets the GitHub API URL (default: {underline https://api.github.com})
   `)
   process.exit(0)

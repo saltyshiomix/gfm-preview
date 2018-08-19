@@ -16,6 +16,9 @@ $ preview file.md --browser firefox
 # preview with chrome on macOS
 $ preview file.md --browser 'google chrome'
 
+# preview custom host and port number
+$ preview file.md --host yourhost --port 3333
+
 # preview with GitHub Enterprise API
 $ preview file.md --github-api-url https://your-ghe-host:port/api/v3
 ```
