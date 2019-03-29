@@ -178,9 +178,9 @@ const url = `http://${host}:${port}`
 const start = async () => {
   try {
     if (args['--browser']) {
-      require('opn')(url + '/' + basename(currentFile), { app: args['--browser'] })
+      require('open')(url + '/' + basename(currentFile), { app: args['--browser'] })
     } else {
-      require('opn')(url + '/' + basename(currentFile))
+      require('open')(url + '/' + basename(currentFile))
     }
     await server.listen(port, host, () => {
       console.log(chalk`> {cyan gfm-preview}: Ready on ${url}`)
