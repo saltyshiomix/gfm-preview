@@ -1,6 +1,6 @@
 {
   "name": "gfm-preview",
-  "version": "1.7.0",
+  "version": "2.0.0",
   "description": "Preview your markdown with GitHub API in real time <3",
   "repository": "git@github.com:saltyshiomix/gfm-preview.git",
   "author": "Yoshihide Shiono <shiono.yoshihide@gmail.com>",
