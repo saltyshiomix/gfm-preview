@@ -1,6 +1,6 @@
 #!/usr/bin/env node
 
-const { resolve, relative, basename, extname } = require('path')
+const { resolve, basename, extname } = require('path')
 const { existsSync, readFileSync } = require('fs')
 const chalk = require('chalk')
 const arg = require('arg')
